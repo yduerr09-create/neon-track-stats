@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CalendarRouteImport } from './routes/calendar'
+import { Route as DriversRouteImport } from './routes/drivers'
+import { Route as TeamsRouteImport } from './routes/teams'
+import { Route as DriverIdRouteImport } from './routes/driver.$id'
+import { Route as TeamIdRouteImport } from './routes/team.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarRoute = CalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriversRoute = DriversRouteImport.update({
+  id: '/drivers',
+  path: '/drivers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamsRoute = TeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverIdRoute = DriverIdRouteImport.update({
+  id: '/driver/$id',
+  path: '/driver/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamIdRoute = TeamIdRouteImport.update({
+  id: '/team/$id',
+  path: '/team/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/calendar': typeof CalendarRoute
+  '/drivers': typeof DriversRoute
+  '/teams': typeof TeamsRoute
+  '/driver/$id': typeof DriverIdRoute
+  '/team/$id': typeof TeamIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/calendar': typeof CalendarRoute
+  '/drivers': typeof DriversRoute
+  '/teams': typeof TeamsRoute
+  '/driver/$id': typeof DriverIdRoute
+  '/team/$id': typeof TeamIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/calendar': typeof CalendarRoute
+  '/drivers': typeof DriversRoute
+  '/teams': typeof TeamsRoute
+  '/driver/$id': typeof DriverIdRoute
+  '/team/$id': typeof TeamIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/calendar'
+    | '/drivers'
+    | '/teams'
+    | '/driver/$id'
+    | '/team/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/calendar'
+    | '/drivers'
+    | '/teams'
+    | '/driver/$id'
+    | '/team/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/calendar'
+    | '/drivers'
+    | '/teams'
+    | '/driver/$id'
+    | '/team/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  CalendarRoute: typeof CalendarRoute
+  DriversRoute: typeof DriversRoute
+  TeamsRoute: typeof TeamsRoute
+  DriverIdRoute: typeof DriverIdRoute
+  TeamIdRoute: typeof TeamIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendar': {
+      id: '/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof CalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drivers': {
+      id: '/drivers'
+      path: '/drivers'
+      fullPath: '/drivers'
+      preLoaderRoute: typeof DriversRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teams': {
+      id: '/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof TeamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver/$id': {
+      id: '/driver/$id'
+      path: '/driver/$id'
+      fullPath: '/driver/$id'
+      preLoaderRoute: typeof DriverIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/team/$id': {
+      id: '/team/$id'
+      path: '/team/$id'
+      fullPath: '/team/$id'
+      preLoaderRoute: typeof TeamIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  CalendarRoute: CalendarRoute,
+  DriversRoute: DriversRoute,
+  TeamsRoute: TeamsRoute,
+  DriverIdRoute: DriverIdRoute,
+  TeamIdRoute: TeamIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
