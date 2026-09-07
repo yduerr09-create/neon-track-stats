@@ -1,11 +1,20 @@
+export type Series = {
+  id: string;
+  name: string;
+  description: string;
+  sort_order: number;
+};
+
 export type Team = {
   id: string;
+  series_id: string;
   name: string;
   color: string;
 };
 
 export type Driver = {
   id: string;
+  series_id: string;
   name: string;
   team_id: string;
   elo: number;
@@ -18,6 +27,7 @@ export type Driver = {
 
 export type Race = {
   id: string;
+  series_id: string;
   round: number;
   track: string;
   country: string;
@@ -39,9 +49,13 @@ export type Result = {
   grid: number;
   points: number;
   incidents: number;
+  pole: boolean;
+  fastest_lap: boolean;
 };
 
 export type LeagueData = {
+  seriesList: Series[];
+  series: Series | undefined;
   teams: Team[];
   drivers: Driver[];
   races: Race[];
@@ -58,6 +72,8 @@ export type DriverStanding = {
   interval: number;
   wins: number;
   podiums: number;
+  poles: number;
+  fastestLaps: number;
   top5: number;
   top10: number;
   starts: number;
@@ -71,6 +87,8 @@ export type TeamStanding = {
   interval: number;
   wins: number;
   podiums: number;
+  poles: number;
+  fastestLaps: number;
   drivers: Driver[];
 };
 

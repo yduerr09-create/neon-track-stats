@@ -15,6 +15,8 @@ export function driverStandings(data: LeagueData): DriverStanding[] {
       points: sum(res.map((r) => r.points)),
       wins: res.filter((r) => r.position === 1).length,
       podiums: res.filter((r) => r.position <= 3).length,
+      poles: res.filter((r) => r.pole).length,
+      fastestLaps: res.filter((r) => r.fastest_lap).length,
       top5: res.filter((r) => r.position <= 5).length,
       top10: res.filter((r) => r.position <= 10).length,
       starts: res.length,
@@ -42,6 +44,8 @@ export function teamStandings(data: LeagueData): TeamStanding[] {
       points: sum(res.map((r) => r.points)),
       wins: res.filter((r) => r.position === 1).length,
       podiums: res.filter((r) => r.position <= 3).length,
+      poles: res.filter((r) => r.pole).length,
+      fastestLaps: res.filter((r) => r.fastest_lap).length,
     };
   });
 
