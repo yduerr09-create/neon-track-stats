@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motorsport Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+
+  <!-- Header & Navigation -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center space-x-3">
+      <span class="text-2xl">🏁</span>
+      <h1 class="text-xl font-bold tracking-wide text-red-500">Motorsport<span class="text-white">Hub</span></h1>
+    </div>
+    <button onclick="toggleAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg border border-slate-700">
+      🔒 Admin
+    </button>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <!-- Serien-Auswahl -->
+    <div class="flex items-center space-x-3 overflow-x-auto pb-2">
+      <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Serie:</span>
+      <select id="seriesFilter" onchange="renderStandings()" class="bg-slate-900 border border-slate-700 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-red-500">
+        <option value="all">Alle Serien</option>
+        <option value="GT3 Sprint">GT3 Sprint Cup</option>
+        <option value="Endurance">Endurance Masters</option>
+      </select>
+    </div>
+
+    <!-- Wertungstabelle -->
+    <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+      <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+        <h2 class="text-lg font-semibold">Fahrerwertung</h2>
+        <span class="text-xs text-slate-400">Automatische Punkteberechnung</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-950/50 text-slate-400 uppercase text-xs">
+            <tr>
+              <th class="p-3 text-center">Pos</th>
+              <th class="p-3">Fahrer</th>
+              <th class="p-3">Team</th>
+              <th class="p-3 text-right">Punkte</th>
+              <th class="p-3 text-right">Gap P1</th>
+              <th class="p-3 text-right">Gap Next</th>
+              <th class="p-3 text-center">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="standingsBody" class="divide-y divide-slate-800/50">
+            <!-- Dynamischer Inhalt -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Driver Card Modal -->
+  <div id="driverModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-sm w-full space-y-4">
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 id="modalDriverName" class="text-xl font-bold">---</h3>
+          <p id="modalDriverTeam" class="text-sm text-slate-400">---</p>
+        </div>
+        <button onclick="closeDriverModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-center">
+          <span class="block text-xs text-slate-500">Elo-Rating</span>
+          <span id="modalDriverElo" class="text-lg font-bold text-red-400">1500</span>
+        </div>
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-center">
+          <span class="block text-xs text-slate-500">Safety Rating</span>
+          <span id="modalDriverSR" class="text-lg font-bold text-emerald-400">99</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. Hier Supabase Zugangsdaten eintragen:
+    const SUPABASE_URL = "https://lzclpkpllxvnfasmctwn.supabase.co/rest/v1/";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6Y2xwa3BsbHh2bmZhc21jdHduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3MjY3MDYsImV4cCI6MjEwNDMwMjcwNn0.o3zsEfaELHe-AWVMfIWrGIdX3Tzby__x8WVVTeZxd6c";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Beispieldaten als Fallback
+    let driverData = [
+      { id: 1, name: "Max Mustermann", team: "Red Speed Racing", series: "GT3 Sprint", points: 125, elo: 1850, sr: 95 },
+      { id: 2, name: "Leon Schmidt", team: "Apex Performance", series: "GT3 Sprint", points: 102, elo: 1720, sr: 88 },
+      { id: 3, name: "Tim Weber", team: "Veloce Esports", series: "Endurance", points: 88, elo: 1640, sr: 99 }
+    ];
+
+    async function loadData() {
+      // Lädt Daten aus Supabase, wenn Konfiguration vorhanden ist
+      if (SUPABASE_URL !== "DEINE_SUPABASE_URL") {
+        const { data, error } = await supabase.from('drivers').select('*');
+        if (!error && data.length > 0) driverData = data;
+      }
+      renderStandings();
+    }
+
+    function renderStandings() {
+      const selectedSeries = document.getElementById('seriesFilter').value;
+      const tbody = document.getElementById('standingsBody');
+      
+      let filtered = driverData.filter(d => selectedSeries === 'all' || d.series === selectedSeries);
+      filtered.sort((a, b) => b.points - a.points);
+
+      const topPoints = filtered.length > 0 ? filtered[0].points : 0;
+
+      tbody.innerHTML = filtered.map((driver, index) => {
+        const gapP1 = topPoints - driver.points;
+        const gapNext = index === 0 ? 0 : filtered[index - 1].points - driver.points;
+
+        return `
+          <tr class="hover:bg-slate-800/30 transition">
+            <td class="p-3 text-center font-bold ${index === 0 ? 'text-yellow-400' : ''}">${index + 1}</td>
+            <td class="p-3 font-semibold">${driver.name}</td>
+            <td class="p-3 text-slate-400">${driver.team}</td>
+            <td class="p-3 text-right font-bold text-red-400">${driver.points}</td>
+            <td class="p-3 text-right text-slate-400 text-xs">${gapP1 > 0 ? '-' + gapP1 : 'Leader'}</td>
+            <td class="p-3 text-right text-slate-400 text-xs">${gapNext > 0 ? '-' + gapNext : '-'}</td>
+            <td class="p-3 text-center">
+              <button onclick="showDriverCard(${driver.id})" class="text-xs bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded">Profil</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function showDriverCard(id) {
+      const driver = driverData.find(d => d.id === id);
+      if (!driver) return;
+      document.getElementById('modalDriverName').innerText = driver.name;
+      document.getElementById('modalDriverTeam').innerText = driver.team;
+      document.getElementById('modalDriverElo').innerText = driver.elo;
+      document.getElementById('modalDriverSR').innerText = driver.sr;
+      document.getElementById('driverModal').classList.remove('hidden');
+    }
+
+    function closeDriverModal() {
+      document.getElementById('driverModal').classList.add('hidden');
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
+
